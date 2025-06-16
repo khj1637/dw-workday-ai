@@ -59,17 +59,19 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
         start = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
         end = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
 
+        # 날짜 목록 만들고
         total_days = (end - start).days + 1
         all_days = [start + datetime.timedelta(days=i) for i in range(total_days)]
 
-        holidays_days = len(holidays) if "공휴일" in selected_options else 0
-        sat_days = len(saturdays) if "토요일" in selected_options else 0
-        sun_days = len(sundays) if "일요일" in selected_options else 0
-
-
+        # 먼저 각 날짜 집합 정의
         holidays = get_holidays_from_csv(start, end) if "공휴일" in selected_options else set()
         saturdays = set(d for d in all_days if d.weekday() == 5) if "토요일" in selected_options else set()
         sundays = set(d for d in all_days if d.weekday() == 6) if "일요일" in selected_options else set()
+
+        # 그 다음 개수 세기
+        holidays_days = len(holidays)
+        sat_days = len(saturdays)
+        sun_days = len(sundays)
 
         rain_stats, rain_avg = get_statistical_rain_days(lat, lon, start, end, years, threshold)
 
