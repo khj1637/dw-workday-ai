@@ -98,7 +98,7 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, years, selecte
         return None
 
 # 4. UI
-st.title("📅 비작업일수 예측기")
+st.title("공사가동률 계산기")
 
 district_coords = {
     "서울특별시": {
