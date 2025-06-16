@@ -2,6 +2,7 @@ import streamlit as st
 import datetime
 import pandas as pd
 import requests
+import xml.etree.ElementTree as ET
 
 # ---------------------------- 기본 설정 ----------------------------
 district_coords = {
@@ -150,3 +151,36 @@ if st.button("📊 예측 시작"):
     st.dataframe(df2, use_container_width=True)
     st.subheader("③ 종합 비작업일 분석")
     st.dataframe(df3, use_container_width=True)
+
+def check_api_key_validity(api_key):
+    url = "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
+    params = {
+        "ServiceKey": api_key,
+        "solYear": "2025",
+        "numOfRows": "5",
+        "_type": "xml"
+    }
+
+    try:
+        res = requests.get(url, params=params)
+        res.raise_for_status()
+
+        root = ET.fromstring(res.text)
+        header = root.find("cmmMsgHeader")
+
+        if header is not None:
+            err_msg = header.findtext("errMsg")
+            auth_msg = header.findtext("returnAuthMsg")
+            return f"❌ 인증 실패: {auth_msg} / {err_msg}"
+        else:
+            return "✅ 인증 성공: 유효한 API Key입니다."
+
+    except Exception as e:
+        return f"❌ 요청 실패: {str(e)}"
+
+
+with st.expander("🔑 공휴일 API 인증키 확인"):
+    input_key = st.text_input("API Key 입력", value="T0O8HHXPZI00FcX+4D2xmYnLG8yJ6nmOrWO/hdqXy//DLuaVgaKYz/RryLDE1ITn9F921p45ZqDf2dy3Gq7YSg==")
+    if st.button("API Key 유효성 확인"):
+        result = check_api_key_validity(input_key)
+        st.write(result)
