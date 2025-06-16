@@ -3,7 +3,7 @@ import datetime
 import pandas as pd
 import requests
 
-# 시도 및 시군구 → 위도/경도 매핑
+# ---------------------------- 기본 설정 ----------------------------
 district_coords = {
     "서울특별시": {
         "강남구": (37.5172, 127.0473), "강동구": (37.5301, 127.1238), "강북구": (37.6396, 127.0257),
@@ -18,7 +18,7 @@ district_coords = {
     }
 }
 
-# 날짜 보정
+# ------------------------- 날짜 포맷 보정 -------------------------
 def normalize_date(date_str):
     if isinstance(date_str, str):
         date_str = date_str.replace(".", "-").replace("/", "-")
@@ -26,50 +26,43 @@ def normalize_date(date_str):
             return f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:]}"
     return date_str
 
-# ✅ 공휴일 API 호출 (Session + User-Agent 사용)
+# ---------------------- 공휴일 조회 함수 (Proxy) ----------------------
 def get_korean_holidays(start, end):
     HOLIDAYS = set()
-    session = requests.Session()
-    session.headers.update({"User-Agent": "Mozilla/5.0"})
-
     for year in range(start.year, end.year + 1):
-        url = "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
-        params = {
-            "ServiceKey": "T0O8HHXPZI00FcX+4D2xmYnLG8yJ6nmOrWO/hdqXy//DLuaVgaKYz/RryLDE1ITn9F921p45ZqDf2dy3Gq7YSg==",
-            "solYear": str(year),
-            "numOfRows": 100,
-            "_type": "json"
-        }
         try:
-            res = session.get(url, params=params, timeout=5)
+            url = f"https://holiday-proxy.hyukjin1637.workers.dev/?year={year}"
+            res = requests.get(url, timeout=10)
             res.raise_for_status()
+
             json_data = res.json()
-            items = json_data.get("response", {}).get("body", {}).get("items", {}).get("item", [])
+            items = json_data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
             if isinstance(items, dict):
                 items = [items]
+
             for item in items:
                 date_str = str(item['locdate'])
                 holiday = datetime.datetime.strptime(date_str, "%Y%m%d").date()
                 if start <= holiday <= end:
                     HOLIDAYS.add(holiday)
         except Exception as e:
-            st.warning(f"❌ {year}년 공휴일 조회 실패: {e}")
+            print(f"❌ {year}년 공휴일 조회 실패: {e}")
             continue
     return HOLIDAYS
 
-# 과거 강수일 분석
+# ---------------------- 과거 강수일 예측 ----------------------
 def get_past_rain_days(lat, lon, start, end, years):
     base_year = start.year
     rain_days = set()
     for y in range(base_year - years, base_year):
-        api_url = (
+        url = (
             f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}"
             f"&start_date={y}-{start.month:02d}-{start.day:02d}"
             f"&end_date={y}-{end.month:02d}-{end.day:02d}"
             f"&daily=precipitation_sum&timezone=Asia%2FSeoul"
         )
         try:
-            res = requests.get(api_url)
+            res = requests.get(url, timeout=10)
             data = res.json()
             for date, rain in zip(data['daily']['time'], data['daily']['precipitation_sum']):
                 if rain >= 1.0:
@@ -79,72 +72,81 @@ def get_past_rain_days(lat, lon, start, end, years):
             continue
     return rain_days
 
-# 메인 예측
-def predict_non_working_days(start, end, sido, sigungu, years, holiday_types):
-    start = normalize_date(start)
-    end = normalize_date(end)
-    start = datetime.datetime.strptime(start, "%Y-%m-%d").date()
-    end = datetime.datetime.strptime(end, "%Y-%m-%d").date()
-    if start > end:
-        st.error("⚠️ 시작일은 종료일보다 이전이어야 합니다.")
-        return
+# ---------------------- 비작업일수 예측 ----------------------
+def predict_non_working_days(start_date, end_date, sido, sigungu, analysis_years, selected_holidays):
+    try:
+        start_date = normalize_date(start_date)
+        end_date = normalize_date(end_date)
 
-    total_days = (end - start).days + 1
-    all_days = [start + datetime.timedelta(days=i) for i in range(total_days)]
-    md_list = [d.strftime("%m-%d") for d in all_days]
+        start = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+        end = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+        if start > end:
+            return "⚠️ 시작일은 종료일보다 이전이어야 합니다."
 
-    lat, lon = district_coords[sido][sigungu]
+        total_days = (end - start).days + 1
+        lat, lon = district_coords[sido][sigungu]
+        all_days = [start + datetime.timedelta(days=i) for i in range(total_days)]
+        md_list = [d.strftime("%m-%d") for d in all_days]
 
-    # 공휴일 계산
-    holiday_set = set()
-    if "법정공휴일" in holiday_types:
-        holiday_set.update(get_korean_holidays(start, end))
-    if "토요일" in holiday_types:
-        holiday_set.update([d for d in all_days if d.weekday() == 5])
-    if "일요일" in holiday_types:
-        holiday_set.update([d for d in all_days if d.weekday() == 6])
-    only_holiday = set([d for d in all_days if d in holiday_set])
+        # 공휴일 계산
+        holiday_days = set()
+        if "법정공휴일" in selected_holidays:
+            holiday_days.update(get_korean_holidays(start, end))
+        if "토요일" in selected_holidays:
+            holiday_days.update([d for d in all_days if d.weekday() == 5])
+        if "일요일" in selected_holidays:
+            holiday_days.update([d for d in all_days if d.weekday() == 6])
 
-    # 강수일 계산
-    rain_md = get_past_rain_days(lat, lon, start, end, years)
-    rain_days = set([d for i, d in enumerate(all_days) if md_list[i] in rain_md])
+        # 날씨 계산
+        rain_md = get_past_rain_days(lat, lon, start, end, int(analysis_years))
+        rain_days = set([d for i, d in enumerate(all_days) if md_list[i] in rain_md])
 
-    # 출력
-    df1 = pd.DataFrame({
-        "구분": ["총 기간", "공휴일 비작업일수", "가동률"],
-        "값": [f"{total_days}일", f"{len(only_holiday)}일", f"{round((total_days - len(only_holiday)) / total_days * 100, 1)}%"]
-    })
-    df2 = pd.DataFrame({
-        "구분": ["총 기간", "강수 비작업일수", "가동률"],
-        "값": [f"{total_days}일", f"{len(rain_days)}일", f"{round((total_days - len(rain_days)) / total_days * 100, 1)}%"]
-    })
-    total_non = only_holiday.union(rain_days)
-    df3 = pd.DataFrame({
-        "구분": ["총 기간", "최종 비작업일수", "최종 가동률"],
-        "값": [f"{total_days}일", f"{len(total_non)}일", f"{round((total_days - len(total_non)) / total_days * 100, 1)}%"]
-    })
+        # 결과표 구성
+        holiday_only = set([d for d in all_days if d in holiday_days])
+        df1 = pd.DataFrame({
+            "구분": ["총 기간", "공휴일 비작업일수", "가동률"],
+            "값": [f"{total_days}일", f"{len(holiday_only)}일", f"{round((total_days - len(holiday_only)) / total_days * 100, 1)}%"]
+        })
 
+        df2 = pd.DataFrame({
+            "구분": ["총 기간", "강수 비작업일수", "가동률"],
+            "값": [f"{total_days}일", f"{len(rain_days)}일", f"{round((total_days - len(rain_days)) / total_days * 100, 1)}%"]
+        })
+
+        total_non_work = holiday_only.union(rain_days)
+        df3 = pd.DataFrame({
+            "구분": ["총 기간", "최종 비작업일수", "최종 가동률"],
+            "값": [f"{total_days}일", f"{len(total_non_work)}일", f"{round((total_days - len(total_non_work)) / total_days * 100, 1)}%"]
+        })
+
+        return df1, df2, df3
+
+    except Exception as e:
+        return f"❌ 오류 발생: {str(e)}"
+
+# ---------------------- Streamlit UI ----------------------
+st.set_page_config(page_title="비작업일수 예측기", layout="centered")
+
+st.title("🏗️ 비작업일수 예측기 (AI 기반)")
+st.markdown("📆 기간과 지역을 선택하면, 날씨 및 공휴일을 반영한 비작업일수를 예측합니다.")
+
+col1, col2 = st.columns(2)
+with col1:
+    start_date = st.text_input("시작일 (예: 2024-01-01 또는 20240101)", value="20240101")
+with col2:
+    end_date = st.text_input("종료일 (예: 2024-12-31 또는 20241231)", value="20241231")
+
+sido = st.selectbox("시도 선택", list(district_coords.keys()))
+sigungu = st.selectbox("시군구 선택", list(district_coords[sido].keys()))
+
+analysis_years = st.slider("과거 강수 분석 기간 (년)", min_value=1, max_value=10, value=5)
+selected_holidays = st.multiselect("비작업일로 포함할 공휴일 항목", ["법정공휴일", "토요일", "일요일"], default=["법정공휴일"])
+
+if st.button("📊 예측 시작"):
+    df1, df2, df3 = predict_non_working_days(start_date, end_date, sido, sigungu, analysis_years, selected_holidays)
     st.subheader("① 공휴일 기준 분석")
     st.dataframe(df1, use_container_width=True)
     st.subheader("② 날씨 기준 분석")
     st.dataframe(df2, use_container_width=True)
     st.subheader("③ 종합 비작업일 분석")
     st.dataframe(df3, use_container_width=True)
-
-# 🌐 Streamlit UI 구성
-st.title("🏗️ 비작업일수 예측기 (AI 기반)")
-st.markdown("기간, 지역, 공휴일 기준을 입력하면 비작업일수를 예측합니다.")
-
-col1, col2 = st.columns(2)
-with col1:
-    start_date = st.text_input("시작일 (YYYY-MM-DD)", "2025-01-01")
-with col2:
-    end_date = st.text_input("종료일 (YYYY-MM-DD)", "2025-12-31")
-
-sido = st.selectbox("시도 선택", options=list(district_coords.keys()), index=0)
-sigungu = st.selectbox("시군구 선택", options=list(district_coords[sido].keys()), index=0)
-years = st.slider("과거 분석 연도 수", 1, 10, 5)
-holiday_options = st.multiselect("공휴일 기준", ["법정공휴일", "토요일", "일요일"], default=["법정공휴일"])
-
-if st.button("예측 시작"):
-    predict_non_working_days(start_date, end_date, sido, sigungu, years, holiday_options)
