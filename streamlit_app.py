@@ -51,15 +51,13 @@ def get_statistical_rain_days(lat, lon, start, end, years=3, threshold=1.0):
     return results, avg
 
 # 3. 예측 실행 함수
-def predict_non_working_days(start_date, end_date, sido, sigungu, years, selected_options, threshold, district_coords):
+def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, years, selected_options, threshold):
     try:
         start = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
         end = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
 
         total_days = (end - start).days + 1
         all_days = [start + datetime.timedelta(days=i) for i in range(total_days)]
-
-        lat, lon = district_coords[sido][sigungu]
 
         holidays = get_holidays_from_csv(start, end) if "공휴일" in selected_options else set()
         saturdays = set(d for d in all_days if d.weekday() == 5) if "토요일" in selected_options else set()
@@ -100,27 +98,31 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, years, selecte
 # 4. UI
 st.title("공사가동률 계산기")
 
-district_coords = {
-    "서울특별시": {
-        "강남구": (37.5172, 127.0473),
-        "마포구": (37.5665, 126.9016),
-    },
-    "경기도": {
-        "성남시": (37.4202, 127.1266),
-        "수원시": (37.2636, 127.0286),
-    }
-}
+@st.cache_data
+def load_district_data():
+    return pd.read_csv("district_coords.csv")
 
-sido = st.selectbox("시도", list(district_coords.keys()))
-sigungu = st.selectbox("시군구", list(district_coords[sido].keys()))
+district_df = load_district_data()
+
+sido_list = sorted(district_df["시도"].unique())
+sido = st.selectbox("시도", sido_list)
+
+sigungu_list = sorted(district_df[district_df["시도"] == sido]["시군구"].unique())
+sigungu = st.selectbox("시군구", sigungu_list)
+
 start_date = st.date_input("분석 시작일", value=datetime.date.today() + datetime.timedelta(days=1))
 end_date = st.date_input("분석 종료일", value=datetime.date.today() + datetime.timedelta(days=60))
 years = st.select_slider("과거 몇 년치 기상 데이터를 활용할까요?", options=list(range(1, 11)), value=3)
 threshold = st.selectbox("강수량 기준 (비작업일로 간주할 강수량)", [1.0, 3.0, 5.0, 10.0], index=1)
 selected_options = st.multiselect("비작업일 포함 기준", ["공휴일", "토요일", "일요일"], default=["공휴일", "토요일", "일요일"])
 
+# 위도/경도 추출
+row = district_df[(district_df["시도"] == sido) & (district_df["시군구"] == sigungu)]
+lat = float(row["위도"].values[0])
+lon = float(row["경도"].values[0])
+
 if st.button("📊 예측 실행"):
-    result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, years, selected_options, threshold, district_coords)
+    result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, lat, lon, years, selected_options, threshold)
     if result:
         df1, df2, df3 = result
         st.subheader("📌 공휴일/토/일 분석")
