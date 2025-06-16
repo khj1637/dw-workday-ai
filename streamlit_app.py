@@ -37,12 +37,15 @@ def get_korean_holidays(start, end):
             "_type": "json"
         }
         try:
+            print(f"📡 요청 중: {url} / {params}")
+            res = requests.get(url, params=params, headers=headers)
+            print(f"📦 응답 수신: {res.status_code}")
+            print(f"📦 응답 텍스트: {res.text[:300]}")  # 너무 길면 일부만
             headers = {
                 "User-Agent": "Mozilla/5.0"
             }
             res = requests.get(url, params=params, headers=headers)
 
-            print(f"📦 {year}년 응답 데이터:\n{res.text}\n")  # ← 여기서 출력
             res.raise_for_status()  # HTTP 오류 감지
 
             json_data = res.json()
