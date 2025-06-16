@@ -40,6 +40,7 @@ def get_korean_holidays(start, end):
             headers = {
                 "User-Agent": "Mozilla/5.0"
             }
+            print(res.text)
             res = requests.get(url, params=params, headers=headers)
             json_data = res.json()
             items = json_data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
