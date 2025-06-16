@@ -2,6 +2,7 @@ import pandas as pd
 import datetime
 import requests
 import streamlit as st
+import matplotlib.pyplot as plt
 
 # 1. CSV 기반 공휴일 로딩
 def get_holidays_from_csv(start: datetime.date, end: datetime.date) -> set:
@@ -80,7 +81,12 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
         })
 
         rain_table = [{"연도": k, "강수일수": v} for k, v in rain_stats.items()]
+        rain_table.insert(0, {"연도": "총 기간", "강수일수": total_days})  # 첫 행에 총 기간 추가
         rain_table.append({"연도": "평균", "강수일수": rain_avg})
+        rain_table.append({
+            "연도": "가동률",
+            "강수일수": f"{round((1 - (rain_avg / total_days)) * 100, 1)}%" if total_days > 0 else "-"
+        })
         df2 = pd.DataFrame(rain_table)
 
         total_non_work = holidays.union(saturdays, sundays)
@@ -127,9 +133,46 @@ if st.button("📊 예측 실행"):
     result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, lat, lon, years, selected_options, threshold)
     if result:
         df1, df2, df3 = result
+
         st.subheader("📌 공휴일/토/일 분석")
         st.dataframe(df1)
+
         st.subheader("📌 날씨 기반 분석 (과거 강수일 수)")
         st.dataframe(df2)
+
         st.subheader("📌 종합 예측 결과")
         st.dataframe(df3)
+
+        # ------- 원형 그래프 3개 시각화 -------
+        holidays_days = len(holidays) if "공휴일" in selected_options else 0
+        sat_days = len(saturdays) if "토요일" in selected_options else 0
+        sun_days = len(sundays) if "일요일" in selected_options else 0
+        non_work1 = holidays_days + sat_days + sun_days
+        work1 = total_days - non_work1
+
+        non_work2 = round(rain_avg)
+        work2 = total_days - non_work2
+
+        total_non_work_days = non_work1 + non_work2
+        work3 = total_days - total_non_work_days
+
+        st.markdown("## 📊 가동률 시각화")
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+            fig1, ax1 = plt.subplots()
+            ax1.pie([work1, non_work1], labels=["가동", "비작업(공휴/주말)"], autopct='%1.1f%%', colors=["#4CAF50", "#FF9999"])
+            ax1.set_title("공휴일/토/일 기반 가동률")
+            st.pyplot(fig1)
+
+        with col2:
+            fig2, ax2 = plt.subplots()
+            ax2.pie([work2, non_work2], labels=["가동", "비작업(강수)"], autopct='%1.1f%%', colors=["#4CAF50", "#2196F3"])
+            ax2.set_title("날씨 기반 가동률")
+            st.pyplot(fig2)
+
+        with col3:
+            fig3, ax3 = plt.subplots()
+            ax3.pie([work3, total_non_work_days], labels=["가동", "비작업(최종)"], autopct='%1.1f%%', colors=["#4CAF50", "#FFCC80"])
+            ax3.set_title("최종 종합 가동률")
+            st.pyplot(fig3)
