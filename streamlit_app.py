@@ -31,7 +31,7 @@ def get_korean_holidays(start, end):
     for year in range(start.year, end.year + 1):
         url = "https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo"
         params = {
-            "ServiceKey": "T0O8HHXPZI00FcX%2B4D2xmYnLG8yJ6nmOrWO%2FhdqXy%2F%2FDLuaVgaKYz%2FRryLDE1ITn9F921p45ZqDf2dy3Gq7YSg%3D%3D",  # 여기! 본인의 공휴일 API KEY로 변경
+            "ServiceKey": "T0O8HHXPZI00FcX+4D2xmYnLG8yJ6nmOrWO/hdqXy//DLuaVgaKYz/RryLDE1ITn9F921p45ZqDf2dy3Gq7YSg==",  # 디코딩된 형태
             "solYear": str(year),
             "numOfRows": 100,
             "_type": "json"
@@ -40,18 +40,23 @@ def get_korean_holidays(start, end):
             headers = {
                 "User-Agent": "Mozilla/5.0"
             }
-            print(res.text)
             res = requests.get(url, params=params, headers=headers)
+
+            print(f"📦 {year}년 응답 데이터:\n{res.text}\n")  # ← 여기서 출력
+            res.raise_for_status()  # HTTP 오류 감지
+
             json_data = res.json()
             items = json_data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
             if isinstance(items, dict):
                 items = [items]
+
             for item in items:
                 date_str = str(item['locdate'])
                 holiday = datetime.datetime.strptime(date_str, "%Y%m%d").date()
                 if start <= holiday <= end:
                     HOLIDAYS.add(holiday)
-        except:
+        except Exception as e:
+            print(f"❌ {year}년 공휴일 조회 실패: {e}")
             continue
     return HOLIDAYS
 
