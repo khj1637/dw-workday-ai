@@ -18,13 +18,15 @@ def get_statistical_rain_days(lat, lon, start, end, years=3, threshold=1.0):
     today = datetime.date.today()
     results = {}
     valid_years = []
+    attempts = 0  # 몇 년치 과거까지 시도했는지 추적
 
-    for y in range(1, years + 1):
-        past_start = start.replace(year=start.year - y)
-        past_end = end.replace(year=end.year - y)
+    while len(valid_years) < years and attempts < 30:  # 안전장치: 최대 30년까지 시도
+        attempts += 1
+        past_start = start.replace(year=start.year - attempts)
+        past_end = end.replace(year=end.year - attempts)
 
         if past_end >= today:
-            continue  # 미래 데이터는 스킵
+            continue  # 미래 구간은 건너뜀
 
         try:
             url = "https://archive-api.open-meteo.com/v1/archive"
