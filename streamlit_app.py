@@ -37,6 +37,9 @@ def get_korean_holidays(start, end):
             "_type": "json"
         }
         try:
+            headers = {
+                "User-Agent": "Mozilla/5.0"
+            }
             res = requests.get(url, params=params)
             json_data = res.json()
             items = json_data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
