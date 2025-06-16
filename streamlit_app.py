@@ -156,7 +156,7 @@ if st.button("📊 예측 실행"):
         total_non_work_days = non_work1 + non_work2
         work3 = total_days - total_non_work_days
 
-        st.markdown("## 📊 가동률 시각화")
+        st.markdown("## 가동률 분석")
         col1, col2, col3 = st.columns(3)
 
         with col1:
