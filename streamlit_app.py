@@ -254,7 +254,6 @@ if st.button("📊 예측 실행"):
         st.dataframe(df2)
 
         st.subheader("3️⃣ 종합 결과")
-        st.dataframe(df3)
         
         # --------- 원형 그래프 ---------
         non_work1 = holidays_days + sat_days + sun_days
@@ -294,3 +293,7 @@ if st.button("📊 예측 실행"):
                 font_prop
             )
             st.pyplot(fig3)
+            
+        st.dataframe(df3)
+
+
