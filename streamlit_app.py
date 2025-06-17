@@ -83,7 +83,6 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         startangle=90,
         colors=colors,
         explode=explode,
-        startangle=90,
         textprops={'fontproperties': font_prop, 'fontsize': 14},
         wedgeprops=dict(edgecolor='white', linewidth=1.5),
         pctdistance=0.6
