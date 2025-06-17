@@ -97,7 +97,7 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     ax.set_aspect('equal')
 
     # ✅ 타이틀은 아래에
-    ax.text(0, -1.4, caption, ha='center', va='top', fontproperties=font_prop, fontsize=14)
+    ax.text(0, -1.4, caption, ha='center', va='top', fontproperties=font_prop, fontsize=18)
 
     # ✅ 범례 추가 (우측 상단)
     ax.legend(
@@ -107,7 +107,7 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         loc="upper right",
         bbox_to_anchor=(1.25, 1),
         prop=font_prop,
-        fontsize=13,
+        fontsize=18,
         title_fontproperties=font_prop
     )
 
@@ -171,6 +171,7 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
         st.error(f"예측 오류: {e}")
         return None
 
+
 # 4. UI
 st.title("공사가동률 계산기")
 
@@ -186,11 +187,18 @@ sido = st.selectbox("시도", sido_list)
 sigungu_list = sorted(district_df[district_df["시도"] == sido]["시군구"].unique())
 sigungu = st.selectbox("시군구", sigungu_list)
 
-start_date = st.date_input("분석 시작일", value=datetime.date.today() + datetime.timedelta(days=1))
-end_date = st.date_input("분석 종료일", value=datetime.date.today() + datetime.timedelta(days=60))
+start_date = st.date_input("공사 시작일", value=datetime.date.today() + datetime.timedelta(days=1))
+end_date = st.date_input("공사 종료일", value=datetime.date.today() + datetime.timedelta(days=60))
 years = st.select_slider("과거 몇 년치 기상 데이터를 활용할까요?", options=list(range(1, 11)), value=3)
 threshold = st.selectbox("강수량 기준 (비작업일로 간주할 강수량)", [1.0, 3.0, 5.0, 10.0], index=1)
-selected_options = st.multiselect("비작업일 포함 기준", ["공휴일", "토요일", "일요일"], default=["공휴일", "토요일", "일요일"])
+
+# ✅ UI에서 표시될 라벨만 바꾸는 함수
+def label_formatter(option):
+    if option == "공휴일":
+        return "법정공휴일"
+    return option
+
+selected_options = st.multiselect("비작업일 포함 휴일 기준", ["공휴일", "토요일", "일요일"], default=["공휴일", "토요일", "일요일"])
 
 # 위도/경도 추출
 row = district_df[(district_df["시도"] == sido) & (district_df["시군구"] == sigungu)]
@@ -202,13 +210,13 @@ if st.button("📊 예측 실행"):
     if result:
         df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days = result
 
-        st.subheader("📌 공휴일/토/일 분석")
+        st.subheader("📌 휴일 분석")
         st.dataframe(df1)
 
-        st.subheader("📌 날씨 기반 분석 (과거 강수일 수)")
+        st.subheader("📌 날씨 기반 분석")
         st.dataframe(df2)
 
-        st.subheader("📌 종합 예측 결과")
+        st.subheader("📌 종합 결과")
         st.dataframe(df3)
 
         # --------- 원형 그래프 ---------
@@ -227,7 +235,7 @@ if st.button("📊 예측 실행"):
             fig1 = draw_fixed_pie(
                 work1, non_work1,
                 ["#4CAF50", "#696969"],
-                "공휴일/토/일 기반 가동률",
+                "휴일 기반 가동률",
                 font_prop
             )
             st.pyplot(fig1)
@@ -245,7 +253,7 @@ if st.button("📊 예측 실행"):
             fig3 = draw_fixed_pie(
                 work3, total_non_work_days,
                 ["#4CAF50", "#696969"],
-                "최종 종합 가동률",
+                "종합 가동률",
                 font_prop
             )
             st.pyplot(fig3)
