@@ -244,10 +244,7 @@ lon = float(row["경도"].values[0])
 
 if st.button("📊 예측 실행"):
     result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, lat, lon, years, selected_options, threshold)
-    if result is None:
-        st.error("예측에 실패했습니다. 입력값이나 서버 상태를 확인해주세요.")
-        st.stop()
-        
+    if result:
         df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days, non_work1 = result
 
         st.subheader("📌 휴일 분석")
@@ -260,6 +257,7 @@ if st.button("📊 예측 실행"):
         st.dataframe(df3)
 
         # --------- 원형 그래프 ---------
+        non_work1 = holidays_days + sat_days + sun_days
         work1 = total_days - non_work1
 
         non_work2 = round(rain_avg)
