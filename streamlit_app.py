@@ -23,6 +23,12 @@ if not os.path.exists(FONT_PATH):
 font_prop = fm.FontProperties(fname=FONT_PATH)
 plt.rcParams['font.family'] = font_prop.get_name()
 
+# ✅ UI에서 표시될 라벨만 바꾸는 함수
+def label_formatter(option):
+    if option == "공휴일":
+        return "법정공휴일"
+    return option
+
 # 1. CSV 기반 공휴일 로딩
 def get_holidays_from_csv(start: datetime.date, end: datetime.date) -> set:
     try:
@@ -191,12 +197,6 @@ start_date = st.date_input("공사 시작일", value=datetime.date.today() + dat
 end_date = st.date_input("공사 종료일", value=datetime.date.today() + datetime.timedelta(days=60))
 years = st.select_slider("과거 몇 년치 기상 데이터를 활용할까요?", options=list(range(1, 11)), value=3)
 threshold = st.selectbox("강수량 기준 (비작업일로 간주할 강수량)", [1.0, 3.0, 5.0, 10.0], index=1)
-
-# ✅ UI에서 표시될 라벨만 바꾸는 함수
-def label_formatter(option):
-    if option == "공휴일":
-        return "법정공휴일"
-    return option
 
 selected_options = st.multiselect("비작업일 포함 휴일 기준", ["공휴일", "토요일", "일요일"], default=["공휴일", "토요일", "일요일"])
 
