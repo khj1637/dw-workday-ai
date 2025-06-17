@@ -72,13 +72,20 @@ def get_statistical_rain_days(lat, lon, start, end, years=3, threshold=1.0):
 # ----------- 동일 원형 그래프 그리는 함수 -------------
 def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     fig, ax = plt.subplots(figsize=(3.5, 3.5))  # 동일한 크기
+
+    explode = [0.05, 0.05]
+    
     wedges, texts, autotexts = ax.pie(
         [work, non_work],
         labels=None,  # ✅ 라벨 제거
         autopct='%1.1f%%',  # ✅ 퍼센트만
+        shadow=True,
+        startangle=90,
         colors=colors,
+        explode=explode,
         startangle=90,
         textprops={'fontproperties': font_prop, 'fontsize': 14},
+        wedgeprops=dict(edgecolor='white', linewidth=1.5),
         pctdistance=0.6
     )
     ax.set_aspect('equal')
@@ -94,6 +101,8 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         loc="upper right",
         bbox_to_anchor=(1.25, 1),
         prop=font_prop
+        fontsize=13,
+        title_fontproperties=font_prop
     )
 
     fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
