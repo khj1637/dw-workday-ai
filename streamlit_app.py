@@ -164,6 +164,9 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
 
         rain_stats, rain_avg = get_statistical_rain_days(lat, lon, start, end, years, threshold)
 
+                
+        non_work1 = holidays_days + sat_days + sun_days
+        
         # 각각 분석
         df1 = pd.DataFrame({
             "구분": ["총 기간", "공휴일", "토요일", "일요일", "가동률"],
@@ -205,7 +208,7 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
         ]
     })
 
-        return df1, df2, df3, holidays_days, sat_days, sun_days, round(rain_avg), total_days
+        return df1, df2, df3, holidays_days, sat_days, sun_days, round(rain_avg), total_days, non_work1
 
     except Exception as e:
         st.error(f"예측 오류: {e}")
@@ -242,7 +245,7 @@ lon = float(row["경도"].values[0])
 if st.button("📊 예측 실행"):
     result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, lat, lon, years, selected_options, threshold)
     if result:
-        df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days = result
+        df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days, non_work1 = result
 
         st.subheader("📌 휴일 분석")
         st.dataframe(df1)
@@ -254,7 +257,6 @@ if st.button("📊 예측 실행"):
         st.dataframe(df3)
 
         # --------- 원형 그래프 ---------
-        non_work1 = holidays_days + sat_days + sun_days
         work1 = total_days - non_work1
 
         non_work2 = round(rain_avg)
