@@ -3,6 +3,22 @@ import datetime
 import requests
 import streamlit as st
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import os
+
+# 폰트 경로
+FONT_URL = "./fonts/NanumGothic.ttf"
+FONT_PATH = "NanumGothic.ttf"
+
+# 폰트 다운로드 (처음 1회만)
+if not os.path.exists(FONT_PATH):
+    response = requests.get(FONT_URL)
+    with open(FONT_PATH, "wb") as f:
+        f.write(response.content)
+
+# matplotlib에 폰트 등록
+font_prop = fm.FontProperties(fname=FONT_PATH)
+plt.rcParams['font.family'] = font_prop.get_name()
 
 # 1. CSV 기반 공휴일 로딩
 def get_holidays_from_csv(start: datetime.date, end: datetime.date) -> set:
