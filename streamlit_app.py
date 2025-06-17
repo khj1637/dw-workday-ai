@@ -86,7 +86,7 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         colors=colors,
         explode=explode,
         textprops={'fontproperties': font_prop, 'fontsize': 14},
-        wedgeprops=dict(edgecolor='#666666', linewidth=1.5),
+        wedgeprops=dict(edgecolor='#000000', linewidth=1.5),
         pctdistance=0.6
     )
     for i, autotext in enumerate(autotexts):
@@ -228,7 +228,7 @@ if st.button("📊 예측 실행"):
         with col1:
             fig1 = draw_fixed_pie(
                 work1, non_work1,
-                ["#4CAF50", "#696969"],
+                ["#4B0082", "#696969"],
                 "휴일 기반 가동률",
                 font_prop
             )
@@ -246,7 +246,7 @@ if st.button("📊 예측 실행"):
         with col3:
             fig3 = draw_fixed_pie(
                 work3, total_non_work_days,
-                ["#4CAF50", "#696969"],
+                ["#800000", "#696969"],
                 "종합 가동률",
                 font_prop
             )
