@@ -79,23 +79,25 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     fig, ax = plt.subplots(figsize=(3.5, 3.5))
     explode = [0.05, 0.05]
     radius = 1.0
-    shadow_offset = 0.03  # y축 아래로 이동
-
-    # ✅ 그림자 wedge 수동 계산
+    shadow_offset = 0.08  # ✅ 더 크게 이동
     values = [work, non_work]
     total = sum(values)
+
+    # ✅ 각도 계산
     angles = [0]
     for v in values:
         angles.append(angles[-1] + v / total * 360)
 
-    shadow_colors = ['#DCDCDC', '#DCDCDC']
+    # ✅ 그림자 Wedge 추가
+    shadow_colors = ['#BBBBBB', '#BBBBBB']  # 좀 더 진한 회색
     for i in range(len(values)):
         wedge = Wedge(center=(0, -shadow_offset), r=radius * 0.98,
                       theta1=angles[i], theta2=angles[i + 1],
-                      facecolor=shadow_colors[i], alpha=0.3, linewidth=0)
+                      facecolor=shadow_colors[i], alpha=0.3,
+                      linewidth=0, zorder=0)  # ✅ zorder 명시
         ax.add_patch(wedge)
 
-    # ✅ 메인 파이 차트
+    # ✅ 실제 파이 차트
     wedges, texts, autotexts = ax.pie(
         values,
         labels=None,
@@ -114,7 +116,12 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         autotext.set_fontsize(24)
 
     ax.set_aspect('equal')
-    ax.text(0, -1.4, caption, ha='center', va='top', fontproperties=font_prop, fontsize=18)
+
+    # ✅ 그림자 영역까지 보이도록 y축 범위 조정
+    ax.set_ylim(-1.4, 1.1)
+
+    ax.text(0, -1.55, caption, ha='center', va='top',
+            fontproperties=font_prop, fontsize=18)
 
     ax.legend(
         wedges,
