@@ -218,8 +218,11 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
 # 4. UI
 st.markdown(
     """
-    <div style="text-align: center; margin-bottom: 20px;">
-        <img src="https://raw.githubusercontent.com/khj1637/dw-workday-ai/main/img/logo.png" alt="로고" width="180">
+    <div style="text-align: center; margin-bottom: 30px;">
+        <img src="https://raw.githubusercontent.com/khj1637/dw-workday-ai/main/img/logo.png"
+             alt="DongwonCI"
+             width="180"
+             style="display: block; margin: auto; padding-bottom: 5px;">
     </div>
     """,
     unsafe_allow_html=True
