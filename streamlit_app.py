@@ -244,127 +244,130 @@ row = district_df[(district_df["시도"] == sido) & (district_df["시군구"] ==
 lat = float(row["위도"].values[0])
 lon = float(row["경도"].values[0])
 
-if st.button("📊 예측 실행"):
-    result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, lat, lon, years, selected_options, threshold)
-    if result:
-        df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days, non_work1 = result
+col1, col2, col3 = st.columns([1, 2, 1])
 
-        st.subheader("1️⃣ 휴일 분석")
-        st.dataframe(df1)
+with col2:
+    if st.button("📊 예측 실행"):
+        result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, lat, lon, years, selected_options, threshold)
+        if result:
+            df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days, non_work1 = result
 
-        st.subheader("2️⃣ 날씨 기반 분석")
-        st.dataframe(df2)
+            st.subheader("1️⃣ 휴일 분석")
+            st.dataframe(df1)
 
-        st.subheader("3️⃣ 계산 결과")
-        
-        # --------- 원형 그래프 ---------
-        non_work1 = holidays_days + sat_days + sun_days
-        work1 = total_days - non_work1
+            st.subheader("2️⃣ 날씨 기반 분석")
+            st.dataframe(df2)
 
-        non_work2 = round(rain_avg)
-        work2 = total_days - non_work2
+            st.subheader("3️⃣ 계산 결과")
 
-        total_non_work_days = non_work1 + non_work2
-        work3 = total_days - total_non_work_days
+            # --------- 원형 그래프 ---------
+            non_work1 = holidays_days + sat_days + sun_days
+            work1 = total_days - non_work1
 
-        col1, col2, col3 = st.columns(3)
+            non_work2 = round(rain_avg)
+            work2 = total_days - non_work2
 
-        with col1:
-            fig1 = draw_fixed_pie(
-                work1, non_work1,
-                ["#4B0082", "#696969"],
-                "휴일 기반 가동률",
-                font_prop
-            )
-            st.pyplot(fig1)
+            total_non_work_days = non_work1 + non_work2
+            work3 = total_days - total_non_work_days
 
-        with col2:
-            fig2 = draw_fixed_pie(
-                work2, non_work2,
-                ["#4CAF50", "#696969"],
-                "날씨 기반 가동률",
-                font_prop
-            )
-            st.pyplot(fig2)
+            col1, col2, col3 = st.columns(3)
 
-        with col3:
-            fig3 = draw_fixed_pie(
-                work3, total_non_work_days,
-                ["#800000", "#696969"],
-                "종합 가동률",
-                font_prop
-            )
-            st.pyplot(fig3)
-            
-        st.dataframe(df3)
-
-        # 📌 계산 기준
-        st.subheader("4️⃣ 계산 결과 보고서")
-        non_work1 = holidays_days + sat_days + sun_days  # 필요 시 기존 정의 유지
-        holiday_utilization = 100 * (total_days - non_work1) / total_days
-        total_non_work = non_work1 + rain_avg  # 전체 비작업일수
-        holiday_utilization = 100 * (total_days - non_work1) / total_days
-        weather_utilization = 100 * (total_days - rain_avg) / total_days
-        final_utilization = 100 * (total_days - total_non_work) / total_days
-
-        st.markdown(f"""
-        - 본 분석은 **{sido} {sigungu} 지역**을 대상으로, **{start_date.strftime('%Y년 %m월 %d일')}부터 {end_date.strftime('%Y년 %m월 %d일')}까지** 총 **{total_days}일**간의 공사기간을 기준으로 진행되었습니다.
-
-        - 날씨에 따른 비작업일은 **최근 {years}년간**의 기상 데이터를 활용하여, 하루 강수량이 **{threshold}mm 이상인 날을 비작업일로 간주**하고 평균을 산출하였습니다. 이에 따라 예측된 평균 비작업일수는 **약 {round(rain_avg)}일**입니다.
-
-        - **휴일 기반 가동률**은 {holiday_utilization:.1f}%로, 전체 **{total_days}일** 중 **{non_work1}일**이 비작업일로 계산되었습니다.
-
-        - **날씨 기반 가동률**은 {weather_utilization:.1f}%로, 전체 **{total_days}일** 중 **{round(rain_avg)}일**이 평균적으로 비작업일로 예측되었습니다.
-
-        - **전체 평균 가동률**은 {final_utilization:.1f}%로, 전체 **{total_days}일** 중 총 **{total_non_work}일**이 비작업일로 반영되었습니다.
-        """)
-
-
-        # 공휴일 설명
-        if "공휴일" in selected_options:
-            df_holidays = pd.read_csv("korean_holidays.csv")
-            df_holidays['date'] = pd.to_datetime(df_holidays['date']).dt.date
-            filtered_holidays = df_holidays[(df_holidays['date'] >= start_date) & (df_holidays['date'] <= end_date)]
-
-            if not filtered_holidays.empty:
-                st.markdown("- 분석 기간 동안 반영된 공휴일은 다음과 같으며, 모두 비작업일로 계산되었습니다:")
-
-                # 표 형식으로 정리하여 출력
-                holiday_table = filtered_holidays[['date', 'holiday_name']].rename(
-                    columns={'date': '날짜', 'holiday_name': '공휴일명'}
+            with col1:
+                fig1 = draw_fixed_pie(
+                    work1, non_work1,
+                    ["#4B0082", "#696969"],
+                    "휴일 기반 가동률",
+                    font_prop
                 )
-                holiday_table['날짜'] = holiday_table['날짜'].apply(lambda x: x.strftime('%Y-%m-%d'))
+                st.pyplot(fig1)
 
-                st.dataframe(holiday_table, use_container_width=True)
+            with col2:
+                fig2 = draw_fixed_pie(
+                    work2, non_work2,
+                    ["#4CAF50", "#696969"],
+                    "날씨 기반 가동률",
+                    font_prop
+                )
+                st.pyplot(fig2)
+
+            with col3:
+                fig3 = draw_fixed_pie(
+                    work3, total_non_work_days,
+                    ["#800000", "#696969"],
+                    "종합 가동률",
+                    font_prop
+                )
+                st.pyplot(fig3)
+
+            st.dataframe(df3)
+
+            # 📌 계산 기준
+            st.subheader("4️⃣ 계산 결과 보고서")
+            non_work1 = holidays_days + sat_days + sun_days  # 필요 시 기존 정의 유지
+            holiday_utilization = 100 * (total_days - non_work1) / total_days
+            total_non_work = non_work1 + rain_avg  # 전체 비작업일수
+            holiday_utilization = 100 * (total_days - non_work1) / total_days
+            weather_utilization = 100 * (total_days - rain_avg) / total_days
+            final_utilization = 100 * (total_days - total_non_work) / total_days
+
+            st.markdown(f"""
+            - 본 분석은 **{sido} {sigungu} 지역**을 대상으로, **{start_date.strftime('%Y년 %m월 %d일')}부터 {end_date.strftime('%Y년 %m월 %d일')}까지** 총 **{total_days}일**간의 공사기간을 기준으로 진행되었습니다.
+
+            - 날씨에 따른 비작업일은 **최근 {years}년간**의 기상 데이터를 활용하여, 하루 강수량이 **{threshold}mm 이상인 날을 비작업일로 간주**하고 평균을 산출하였습니다. 이에 따라 예측된 평균 비작업일수는 **약 {round(rain_avg)}일**입니다.
+
+            - **휴일 기반 가동률**은 {holiday_utilization:.1f}%로, 전체 **{total_days}일** 중 **{non_work1}일**이 비작업일로 계산되었습니다.
+
+            - **날씨 기반 가동률**은 {weather_utilization:.1f}%로, 전체 **{total_days}일** 중 **{round(rain_avg)}일**이 평균적으로 비작업일로 예측되었습니다.
+
+            - **전체 평균 가동률**은 {final_utilization:.1f}%로, 전체 **{total_days}일** 중 총 **{total_non_work}일**이 비작업일로 반영되었습니다.
+            """)
+
+            # 공휴일 설명
+            if "공휴일" in selected_options:
+                df_holidays = pd.read_csv("korean_holidays.csv")
+                df_holidays['date'] = pd.to_datetime(df_holidays['date']).dt.date
+                filtered_holidays = df_holidays[(df_holidays['date'] >= start_date) & (df_holidays['date'] <= end_date)]
+
+                if not filtered_holidays.empty:
+                    st.markdown("- 분석 기간 동안 반영된 공휴일은 다음과 같으며, 모두 비작업일로 계산되었습니다:")
+
+                    # 표 형식으로 정리하여 출력
+                    holiday_table = filtered_holidays[['date', 'holiday_name']].rename(
+                        columns={'date': '날짜', 'holiday_name': '공휴일명'}
+                    )
+                    holiday_table['날짜'] = holiday_table['날짜'].apply(lambda x: x.strftime('%Y-%m-%d'))
+
+                    st.dataframe(holiday_table, use_container_width=True)
+                else:
+                    st.markdown("- 분석 기간 내에 해당하는 공휴일이 없어, 공휴일에 따른 비작업일은 적용되지 않았습니다.")
             else:
-                st.markdown("- 분석 기간 내에 해당하는 공휴일이 없어, 공휴일에 따른 비작업일은 적용되지 않았습니다.")
-        else:
-            st.markdown("- 사용자가 공휴일 반영을 선택하지 않아, 공휴일은 비작업일 계산에 포함되지 않았습니다.")
+                st.markdown("- 사용자가 공휴일 반영을 선택하지 않아, 공휴일은 비작업일 계산에 포함되지 않았습니다.")
 
-        # 주말 설명
-        weekends = []
-        if "토요일" in selected_options:
-            weekends.append("토요일")
-        if "일요일" in selected_options:
-            weekends.append("일요일")
+            # 주말 설명
+            weekends = []
+            if "토요일" in selected_options:
+                weekends.append("토요일")
+            if "일요일" in selected_options:
+                weekends.append("일요일")
 
-        if weekends:
-            st.markdown(f"- 주말 중 **{', '.join(weekends)}**도 비작업일로 포함하여 계산하였습니다.")
-        else:
-            st.markdown("- 주말은 비작업일에 포함하지 않고 계산하였습니다.")
+            if weekends:
+                st.markdown(f"- 주말 중 **{', '.join(weekends)}**도 비작업일로 포함하여 계산하였습니다.")
+            else:
+                st.markdown("- 주말은 비작업일에 포함하지 않고 계산하였습니다.")
 
-        # 📌 시스템 설명
-        st.subheader("5️⃣ 시스템 설명")
+            # 📌 시스템 설명
+            st.subheader("5️⃣ 시스템 설명")
 
-        st.markdown(f"""
-        본 시스템은 다양한 요인에 따른 **비작업일을 예측하고 가동률을 정량적으로 분석**하는 도구입니다. 단순한 통계 산출을 넘어서, 다음과 같은 기능들을 포함하고 있습니다:
+            st.markdown(f"""
+            본 시스템은 다양한 요인에 따른 **비작업일을 예측하고 가동률을 정량적으로 분석**하는 도구입니다. 단순한 통계 산출을 넘어서, 다음과 같은 기능들을 포함하고 있습니다:
 
-        -  **위도/경도 기반 지역별 맞춤 기상 분석**: 선택한 시군구의 좌표에 따라 해당 지역의 실제 기상 데이터를 자동으로 조회하여 분석합니다.
-        -  **과거 최대 10년치 강수 이력 조회**: Open-Meteo의 과거 데이터 API를 이용해, 지정한 연도 수만큼의 강수 데이터를 바탕으로 통계적 평균을 산출합니다.
-        -  **선택적 주말/공휴일 포함 옵션**: 사용자가 공휴일, 토요일, 일요일 중 선택한 항목만 비작업일로 포함하여 유연하게 분석할 수 있습니다.
-        -  **시각화된 원형 그래프 제공**: 휴일 기반 / 날씨 기반 / 종합 가동률을 시각적으로 비교할 수 있도록 디자인된 차트가 함께 제공됩니다.
-        -  사용자에게 **계산의 기준**과 **반영된 공휴일 리스트**를 **자동 출력**하여, **결과 해석 및 누락**에 대한 **보완**이 가능이 가능합니다.
-        """)
+            -  **위도/경도 기반 지역별 맞춤 기상 분석**: 선택한 시군구의 좌표에 따라 해당 지역의 실제 기상 데이터를 자동으로 조회하여 분석합니다.
+            -  **과거 최대 10년치 강수 이력 조회**: Open-Meteo의 과거 데이터 API를 이용해, 지정한 연도 수만큼의 강수 데이터를 바탕으로 통계적 평균을 산출합니다.
+            -  **선택적 주말/공휴일 포함 옵션**: 사용자가 공휴일, 토요일, 일요일 중 선택한 항목만 비작업일로 포함하여 유연하게 분석할 수 있습니다.
+            -  **시각화된 원형 그래프 제공**: 휴일 기반 / 날씨 기반 / 종합 가동률을 시각적으로 비교할 수 있도록 디자인된 차트가 함께 제공됩니다.
+            -  사용자에게 **계산의 기준**과 **반영된 공휴일 리스트**를 **자동 출력**하여, **결과 해석 및 누락**에 대한 **보완**이 가능이 가능합니다.
+            """)
+
 
 
 
