@@ -74,6 +74,10 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     fig, ax = plt.subplots(figsize=(3.5, 3.5))  # 동일한 크기
 
     explode = [0.05, 0.05]
+
+    # 그림자처럼 보일 배경 원 추가
+    shadow_circle = plt.Circle((0, 0), 1.05, color='gray', alpha=0.2, zorder=0)
+    ax.add_patch(shadow_circle)
     
     wedges, texts, autotexts = ax.pie(
         [work, non_work],
