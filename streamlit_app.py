@@ -180,18 +180,39 @@ if st.button("📊 예측 실행"):
 
         with col1:
             fig1, ax1 = plt.subplots()
-            ax1.pie([work1, non_work1], labels=["가동", "비작업(공휴/주말)"], autopct='%1.1f%%', colors=["#4CAF50", "#FF9999"], textprops={'fontproperties': font_prop, 'fontsize': 14})
-            ax1.set_title("공휴일/토/일 기반 가동률", fontproperties=font_prop, fontsize=16)
+            ax1.pie(
+                [work1, non_work1],
+                labels=["가동", "비작업(공휴/주말)"],
+                autopct='%1.1f%%',
+                colors=["#4CAF50", "#FF9999"],
+                textprops={'fontproperties': font_prop, 'fontsize': 14}
+            )
+            ax1.set_aspect('equal')
+            ax1.text(0, -1.3, "공휴일/토/일 기반 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
             st.pyplot(fig1)
 
         with col2:
             fig2, ax2 = plt.subplots()
-            ax2.pie([work2, non_work2], labels=["가동", "비작업(강수)"], autopct='%1.1f%%', colors=["#4CAF50", "#2196F3"], textprops={'fontproperties': font_prop, 'fontsize': 14})
-            ax2.set_title("날씨 기반 가동률", fontproperties=font_prop, fontsize=16)
+            ax2.pie(
+                [work2, non_work2],
+                labels=["가동", "비작업(강수)"],
+                autopct='%1.1f%%',
+                colors=["#4CAF50", "#2196F3"],
+                textprops={'fontproperties': font_prop, 'fontsize': 14}
+            )
+            ax2.set_aspect('equal')
+            ax2.text(0, -1.3, "날씨 기반 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
             st.pyplot(fig2)
 
         with col3:
             fig3, ax3 = plt.subplots()
-            ax3.pie([work3, total_non_work_days], labels=["가동", "비작업(최종)"], autopct='%1.1f%%', colors=["#4CAF50", "#FFCC80"], textprops={'fontproperties': font_prop, 'fontsize': 14})
-            ax3.set_title("최종 종합 가동률", fontproperties=font_prop, fontsize=16)
+            ax3.pie(
+                [work3, total_non_work_days],
+                labels=["가동", "비작업(최종)"],
+                autopct='%1.1f%%',
+                colors=["#4CAF50", "#FFCC80"],
+                textprops={'fontproperties': font_prop, 'fontsize': 14}
+            )
+            ax3.set_aspect('equal')
+            ax3.text(0, -1.3, "최종 종합 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
             st.pyplot(fig3)
