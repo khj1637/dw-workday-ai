@@ -247,15 +247,15 @@ if st.button("📊 예측 실행"):
     if result:
         df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days, non_work1 = result
 
-        st.subheader("📌 휴일 분석")
+        st.subheader("1️⃣ 휴일 분석")
         st.dataframe(df1)
 
-        st.subheader("📌 날씨 기반 분석")
+        st.subheader("2️⃣ 날씨 기반 분석")
         st.dataframe(df2)
 
-        st.subheader("📌 종합 결과")
+        st.subheader("3️⃣ 종합 결과")
         st.dataframe(df3)
-
+        
         # --------- 원형 그래프 ---------
         non_work1 = holidays_days + sat_days + sun_days
         work1 = total_days - non_work1
