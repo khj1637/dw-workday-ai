@@ -300,6 +300,10 @@ if st.button("📊 예측 실행"):
         st.subheader("4️⃣ 계산 결과 보고서")
         non_work1 = holidays_days + sat_days + sun_days  # 필요 시 기존 정의 유지
         holiday_utilization = 100 * (total_days - non_work1) / total_days
+        total_non_work = non_work1 + rain_avg  # 전체 비작업일수
+        holiday_utilization = 100 * (total_days - non_work1) / total_days
+        weather_utilization = 100 * (total_days - rain_avg) / total_days
+        final_utilization = 100 * (total_days - total_non_work) / total_days
 
         st.markdown(f"""
         - 본 분석은 **{sido} {sigungu} 지역**을 대상으로, **{start_date.strftime('%Y년 %m월 %d일')}부터 {end_date.strftime('%Y년 %m월 %d일')}까지** 총 **{total_days}일**간의 공사기간을 기준으로 진행되었습니다.
