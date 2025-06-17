@@ -305,15 +305,22 @@ if st.button("📊 예측 실행"):
         - 날씨에 따른 비작업일은 **최근 {years}년간**의 기상 데이터를 활용하여, 하루 강수량이 **{threshold}mm 이상인 날을 비작업일로 간주**하고 평균을 산출하였습니다. 이에 따라 예측된 평균 비작업일수는 **약 {round(rain_avg)}일**입니다.
         """)
 
-        # ✅ 공휴일 설명
+        # 공휴일 설명
         if "공휴일" in selected_options:
             df_holidays = pd.read_csv("korean_holidays.csv")
             df_holidays['date'] = pd.to_datetime(df_holidays['date']).dt.date
             filtered_holidays = df_holidays[(df_holidays['date'] >= start_date) & (df_holidays['date'] <= end_date)]
-            holiday_list = [f"{d.strftime('%m/%d')} {n}" for d, n in zip(filtered_holidays['date'], filtered_holidays['holiday_name'])]
-            if holiday_list:
-                holiday_text = " / ".join(holiday_list)
-                st.markdown(f"- 분석 기간 동안 반영된 공휴일은 다음과 같으며, 모두 비작업일로 계산되었습니다: **{holiday_text}**.")
+
+            if not filtered_holidays.empty:
+                st.markdown("- 분석 기간 동안 반영된 공휴일은 다음과 같으며, 모두 비작업일로 계산되었습니다:")
+
+                # 표 형식으로 정리하여 출력
+                holiday_table = filtered_holidays[['date', 'holiday_name']].rename(
+                    columns={'date': '날짜', 'holiday_name': '공휴일명'}
+                )
+                holiday_table['날짜'] = holiday_table['날짜'].apply(lambda x: x.strftime('%Y-%m-%d'))
+
+                st.dataframe(holiday_table, use_container_width=True)
             else:
                 st.markdown("- 분석 기간 내에 해당하는 공휴일이 없어, 공휴일에 따른 비작업일은 적용되지 않았습니다.")
         else:
