@@ -105,14 +105,20 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     for v in values:
         angles.append(angles[-1] + v / total * 360)
 
-    # ✅ 그림자 wedge 추가 (파이 그린 후 뒤에서!)
+    # 그림자 wedge 추가 (먼저 그림, zorder 낮게)
     for i in range(len(values)):
         theta1 = angles[i]
         theta2 = angles[i + 1]
-        wedge = Wedge(center=(0, -0.12), r=0.95,
-                      theta1=theta1, theta2=theta2,
-                      facecolor='#888888', alpha=0.3,
-                      linewidth=0)
+        wedge = Wedge(
+            center=(0.08, -0.08),  # ↘ 방향 그림자
+            r=0.95,
+            theta1=theta1,
+            theta2=theta2,
+            facecolor='#555555',
+            alpha=0.5,
+            linewidth=0,
+            zorder=0  # ✅ 낮은 z순서로 뒤에 깔리게
+        )
         ax.add_patch(wedge)
 
     ax.set_aspect('equal')
