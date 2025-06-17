@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import matplotlib.transforms as mtransforms
 from matplotlib.font_manager import FontProperties
+from matplotlib.patches import Wedge
 import os
 
 percent_font = FontProperties(fname="fonts/NanumBarunGothicBold.ttf")
