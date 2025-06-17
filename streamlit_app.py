@@ -244,7 +244,7 @@ row = district_df[(district_df["시도"] == sido) & (district_df["시군구"] ==
 lat = float(row["위도"].values[0])
 lon = float(row["경도"].values[0])
 
-if st.button("📊 예측 실행"):
+if st.button("📊 예측 실행", use_container_width=True):
     result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, lat, lon, years, selected_options, threshold)
     if result:
         df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days, non_work1 = result
