@@ -104,7 +104,7 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
             "값": [f"{total_days}일", f"{round(total_non_work_days)}일", f"{round((total_days - total_non_work_days) / total_days * 100, 1)}%"]
         })
 
-        return df1, df2, df3, holidays_days, sat_days, sun_days, round(rain_avg)
+        return df1, df2, df3, holidays_days, sat_days, sun_days, round(rain_avg), total_days
 
     except Exception as e:
         st.error(f"예측 오류: {e}")
@@ -139,7 +139,7 @@ lon = float(row["경도"].values[0])
 if st.button("📊 예측 실행"):
     result = predict_non_working_days(str(start_date), str(end_date), sido, sigungu, lat, lon, years, selected_options, threshold)
     if result:
-        df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg = result
+        df1, df2, df3, holidays_days, sat_days, sun_days, rain_avg, total_days = result
 
         st.subheader("📌 공휴일/토/일 분석")
         st.dataframe(df1)
