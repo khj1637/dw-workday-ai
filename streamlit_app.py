@@ -82,6 +82,9 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     shadow_colors = ['#DCDCDC', '#DCDCDC']  # ✅ 원하는 그림자 색상
     shadow_explode = [0.05, 0.05]
 
+    # 변환: 아래쪽으로 0.03만큼 이동 (그림자 효과)
+    trans = mtransforms.Affine2D().translate(0, -0.03) + ax.transData
+
     # 그림자용 pie (아래쪽에 위치하도록)
     ax.pie(
         [work, non_work],
