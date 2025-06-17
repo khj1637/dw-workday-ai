@@ -310,7 +310,7 @@ if st.button("📊 예측 실행"):
             df_holidays = pd.read_csv("korean_holidays.csv")
             df_holidays['date'] = pd.to_datetime(df_holidays['date']).dt.date
             filtered_holidays = df_holidays[(df_holidays['date'] >= start_date) & (df_holidays['date'] <= end_date)]
-            holiday_list = [f"{d.strftime('%m/%d')} {n}" for d, n in zip(filtered_holidays['date'], filtered_holidays['name'])]
+            holiday_list = [f"{d.strftime('%m/%d')} {n}" for d, n in zip(filtered_holidays['date'], filtered_holidays['holiday_name'])]
             if holiday_list:
                 holiday_text = " / ".join(holiday_list)
                 st.markdown(f"- 분석 기간 동안 반영된 공휴일은 다음과 같으며, 모두 비작업일로 계산되었습니다: **{holiday_text}**.")
