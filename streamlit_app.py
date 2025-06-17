@@ -78,24 +78,19 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     fig, ax = plt.subplots(figsize=(3.5, 3.5))  # 동일한 크기
 
     explode = [0.05, 0.05]
+    radius = 1.0
+    shadow_offset = 0.03  # y축 아래로 이동
 
-    # 원래 그래프보다 약간 작은 반투명 pie를 먼저 그림자처럼 그림
-    shadow_colors = ['#DCDCDC', '#DCDCDC']  # ✅ 원하는 그림자 색상
-    shadow_explode = [0.05, 0.05]
-
-    # 변환: 아래쪽으로 0.03만큼 이동 (그림자 효과)
-    trans = mtransforms.Affine2D().translate(0, -0.03) + ax.transData
-
-    # 그림자용 pie (아래쪽에 위치하도록)
-    ax.pie(
-        [work, non_work],
-        radius=0.98,  # ✅ 살짝 작게
-        colors=shadow_colors,
-        explode=shadow_explode,
-        startangle=90,
-        frame=False,
-        wedgeprops=dict(alpha=0.3, linewidth=0)
-    )
+    # ✅ 그림자용 wedge 직접 추가
+    angles = [0, work / (work + non_work) * 360]
+    shadow_colors = ['#DCDCDC', '#DCDCDC']
+    for i, value in enumerate([work, non_work]):
+        theta1 = angles[i]
+        theta2 = angles[i + 1] if i + 1 < len(angles) else 360
+        wedge = Wedge(center=(0, -shadow_offset), r=radius * 0.98,
+                      theta1=theta1, theta2=theta2,
+                      facecolor=shadow_colors[i], alpha=0.3, linewidth=0)
+        ax.add_patch(wedge)
     
     wedges, texts, autotexts = ax.pie(
         [work, non_work],
