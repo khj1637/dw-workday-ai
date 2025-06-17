@@ -7,7 +7,7 @@ import matplotlib.font_manager as fm
 import os
 
 # 폰트 경로
-FONT_URL = "./fonts/NanumGothic.ttf"
+FONT_URL = "https://raw.githubusercontent.com/khj1637/dw-workday-ai/main/fonts/NanumGothic.ttf"
 FONT_PATH = "NanumGothic.ttf"
 
 # 폰트 다운로드 (처음 1회만)
