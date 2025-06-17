@@ -83,9 +83,12 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         colors=colors,
         explode=explode,
         textprops={'fontproperties': font_prop, 'fontsize': 14},
-        wedgeprops=dict(edgecolor='#444444', linewidth=1.5),
+        wedgeprops=dict(edgecolor='#666666', linewidth=1.5),
         pctdistance=0.6
     )
+
+    autotexts[0].set_color('white')     # 첫 번째 조각 (가동)
+    autotexts[1].set_color('white')     # 두 번째 조각 (비작업)
     ax.set_aspect('equal')
 
     # ✅ 타이틀은 아래에
@@ -218,7 +221,7 @@ if st.button("📊 예측 실행"):
         with col1:
             fig1 = draw_fixed_pie(
                 work1, non_work1,
-                ["#4CAF50", "#FF9999"],
+                ["#4CAF50", "#696969"],
                 "공휴일/토/일 기반 가동률",
                 font_prop
             )
@@ -227,7 +230,7 @@ if st.button("📊 예측 실행"):
         with col2:
             fig2 = draw_fixed_pie(
                 work2, non_work2,
-                ["#4CAF50", "#2196F3"],
+                ["#4CAF50", "#696969"],
                 "날씨 기반 가동률",
                 font_prop
             )
@@ -236,7 +239,7 @@ if st.button("📊 예측 실행"):
         with col3:
             fig3 = draw_fixed_pie(
                 work3, total_non_work_days,
-                ["#4CAF50", "#FFCC80"],
+                ["#4CAF50", "#696969"],
                 "최종 종합 가동률",
                 font_prop
             )
