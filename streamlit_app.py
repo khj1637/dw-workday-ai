@@ -102,12 +102,11 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     # ✅ 범례 추가 (우측 상단)
     ax.legend(
         wedges,
-        ["가동", "비작업"],
-        title="범례",
+        ["가동률", "비작업일"],
         loc="upper right",
         bbox_to_anchor=(1.25, 1),
         prop=font_prop,
-        fontsize=18,
+        fontsize=20,
         title_fontproperties=font_prop
     )
 
