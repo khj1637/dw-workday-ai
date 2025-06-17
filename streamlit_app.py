@@ -216,8 +216,10 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
 
 
 # 4. UI
-st.title("공사가동률 계산기")
-
+st.markdown(
+    "<h1 style='text-align: center;'>공사가동률 계산기</h1>",
+    unsafe_allow_html=True
+)
 @st.cache_data
 def load_district_data():
     return pd.read_csv("district_coords.csv")
