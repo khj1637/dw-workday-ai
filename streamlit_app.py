@@ -109,9 +109,9 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     for i in range(len(values)):
         theta1 = angles[i]
         theta2 = angles[i + 1]
-        wedge = Wedge(center=(0.08, -0.08), r=0.95,
+        wedge = Wedge(center=(0, -0.12), r=0.95,
                       theta1=theta1, theta2=theta2,
-                      facecolor='#888888', alpha=0.5,
+                      facecolor='#888888', alpha=0.3,
                       linewidth=0)
         ax.add_patch(wedge)
 
