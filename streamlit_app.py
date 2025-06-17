@@ -296,4 +296,40 @@ if st.button("📊 예측 실행"):
             
         st.dataframe(df3)
 
+        st.subheader("🧮 계산 기준")
+
+        st.markdown(f"""
+        - 본 분석은 **{sido} {sigungu} 지역**을 대상으로, **{start_date.strftime('%Y년 %m월 %d일')}부터 {end_date.strftime('%Y년 %m월 %d일')}까지** 총 {total_days}일간의 공사기간을 기준으로 진행되었습니다.
+
+        - 날씨에 따른 비작업일은 **최근 {years}년간**의 기상 데이터를 활용하여, 하루 강수량이 **{threshold}mm 이상인 날을 비작업일로 간주**하고 평균을 산출하였습니다. 이에 따라 예측된 평균 비작업일수는 **약 {round(rain_avg)}일**입니다.
+
+        """)
+
+        # 공휴일 설명
+        if "공휴일" in selected_options:
+            df_holidays = pd.read_csv("korean_holidays.csv")
+            df_holidays['date'] = pd.to_datetime(df_holidays['date']).dt.date
+            filtered_holidays = df_holidays[(df_holidays['date'] >= start_date) & (df_holidays['date'] <= end_date)]
+            holiday_list = [f"{d.strftime('%m/%d')} {n}" for d, n in zip(filtered_holidays['date'], filtered_holidays['name'])]
+            if holiday_list:
+                holiday_text = " / ".join(holiday_list)
+                st.markdown(f"- 분석 기간 동안 반영된 공휴일은 다음과 같으며, 모두 비작업일로 계산되었습니다: **{holiday_text}**.")
+            else:
+                st.markdown("- 분석 기간 내에 해당하는 공휴일이 없어, 공휴일에 따른 비작업일은 적용되지 않았습니다.")
+        else:
+            st.markdown("- 사용자가 공휴일 반영을 선택하지 않아, 공휴일은 비작업일 계산에 포함되지 않았습니다.")
+
+        # 주말 설명
+        weekends = []
+        if "토요일" in selected_options:
+            weekends.append("토요일")
+        if "일요일" in selected_options:
+            weekends.append("일요일")
+
+        if weekends:
+            st.markdown(f"- 주말 중 **{', '.join(weekends)}**도 비작업일로 포함하여 계산하였습니다.")
+        else:
+            st.markdown("- 주말은 비작업일에 포함하지 않고 계산하였습니다.")
+
+
 
