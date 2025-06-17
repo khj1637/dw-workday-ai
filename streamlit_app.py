@@ -182,17 +182,17 @@ if st.button("📊 예측 실행"):
         with col1:
             fig1, ax1 = plt.subplots()
             ax1.pie([work1, non_work1], labels=["가동", "비작업(공휴/주말)"], autopct='%1.1f%%', colors=["#4CAF50", "#FF9999"])
-            ax1.set_title("공휴일/토/일 기반 가동률")
+            ax1.set_title("공휴일/토/일 기반 가동률", fontproperties=font_prop)
             st.pyplot(fig1)
 
         with col2:
             fig2, ax2 = plt.subplots()
             ax2.pie([work2, non_work2], labels=["가동", "비작업(강수)"], autopct='%1.1f%%', colors=["#4CAF50", "#2196F3"])
-            ax2.set_title("날씨 기반 가동률")
+            ax2.set_title("날씨 기반 가동률", fontproperties=font_prop)
             st.pyplot(fig2)
 
         with col3:
             fig3, ax3 = plt.subplots()
             ax3.pie([work3, total_non_work_days], labels=["가동", "비작업(최종)"], autopct='%1.1f%%', colors=["#4CAF50", "#FFCC80"])
-            ax3.set_title("최종 종합 가동률")
+            ax3.set_title("최종 종합 가동률", fontproperties=font_prop)
             st.pyplot(fig3)
