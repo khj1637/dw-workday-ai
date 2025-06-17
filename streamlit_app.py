@@ -150,10 +150,7 @@ if st.button("📊 예측 실행"):
         st.subheader("📌 종합 예측 결과")
         st.dataframe(df3)
 
-        # ------- 원형 그래프 3개 시각화 -------
-        holidays_days = len(holidays) if "공휴일" in selected_options else 0
-        sat_days = len(saturdays) if "토요일" in selected_options else 0
-        sun_days = len(sundays) if "일요일" in selected_options else 0
+        # --------- 원형 그래프 ---------
         non_work1 = holidays_days + sat_days + sun_days
         work1 = total_days - non_work1
 
