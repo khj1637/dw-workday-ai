@@ -77,7 +77,22 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
     fig, ax = plt.subplots(figsize=(3.5, 3.5))  # 동일한 크기
 
     explode = [0.05, 0.05]
-   
+
+    # 원래 그래프보다 약간 작은 반투명 pie를 먼저 그림자처럼 그림
+    shadow_colors = ['#DCDCDC', '#DCDCDC']  # ✅ 원하는 그림자 색상
+    shadow_explode = [0.05, 0.05]
+
+    # 그림자용 pie (아래쪽에 위치하도록)
+    ax.pie(
+        [work, non_work],
+        radius=0.98,  # ✅ 살짝 작게
+        colors=shadow_colors,
+        explode=shadow_explode,
+        startangle=90,
+        frame=False,
+        wedgeprops=dict(alpha=0.3, linewidth=0)
+    )
+    
     wedges, texts, autotexts = ax.pie(
         [work, non_work],
         labels=None,  # ✅ 라벨 제거
