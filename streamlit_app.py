@@ -4,7 +4,10 @@ import requests
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+from matplotlib.font_manager import FontProperties
 import os
+
+percent_font = FontProperties(fname="fonts/NanumBarunGothicBold.ttf")
 
 # 폰트 경로
 FONT_URL = "https://raw.githubusercontent.com/khj1637/dw-workday-ai/main/fonts/NanumGothic.ttf"
@@ -86,9 +89,11 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         wedgeprops=dict(edgecolor='#666666', linewidth=1.5),
         pctdistance=0.6
     )
-
-    autotexts[0].set_color('white')     # 첫 번째 조각 (가동)
-    autotexts[1].set_color('white')     # 두 번째 조각 (비작업)
+    for autotext in autotexts:
+        autotext.set_fontproperties(percent_font)
+        autotexts[0].set_color('white')     # 첫 번째 조각 (가동)
+        autotexts[1].set_color('white')     # 두 번째 조각 (비작업)
+        
     ax.set_aspect('equal')
 
     # ✅ 타이틀은 아래에
