@@ -179,7 +179,7 @@ if st.button("📊 예측 실행"):
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            fig1, ax1 = plt.subplots()
+            fig1, ax1 = plt.subplots(figsize=(4, 4))
             ax1.pie(
                 [work1, non_work1],
                 labels=["가동", "비작업(공휴/주말)"],
@@ -189,10 +189,11 @@ if st.button("📊 예측 실행"):
             )
             ax1.set_aspect('equal')
             ax1.text(0, -1.3, "공휴일/토/일 기반 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
+            fig1.tight_layout(pad=2)
             st.pyplot(fig1)
 
         with col2:
-            fig2, ax2 = plt.subplots()
+            fig2, ax2 = plt.subplots(figsize=(4, 4))
             ax2.pie(
                 [work2, non_work2],
                 labels=["가동", "비작업(강수)"],
@@ -202,10 +203,11 @@ if st.button("📊 예측 실행"):
             )
             ax2.set_aspect('equal')
             ax2.text(0, -1.3, "날씨 기반 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
+            fig2.tight_layout(pad=2)
             st.pyplot(fig2)
 
         with col3:
-            fig3, ax3 = plt.subplots()
+            fig3, ax3 = plt.subplots(figsize=(4, 4))
             ax3.pie(
                 [work3, total_non_work_days],
                 labels=["가동", "비작업(최종)"],
@@ -215,4 +217,5 @@ if st.button("📊 예측 실행"):
             )
             ax3.set_aspect('equal')
             ax3.text(0, -1.3, "최종 종합 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
+            fig3.tight_layout(pad=2)
             st.pyplot(fig3)
