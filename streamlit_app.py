@@ -189,9 +189,21 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
         total_non_work_days = len(total_non_work) + rain_avg
 
         df3 = pd.DataFrame({
-            "구분": ["총 기간", "최종 비작업일수", "최종 가동률"],
-            "값": [f"{total_days}일", f"{round(total_non_work_days)}일", f"{round((total_days - total_non_work_days) / total_days * 100, 1)}%"]
-        })
+        "구분": [
+            "총 기간",
+            "휴일 분석 결과",
+            "날씨 분석 결과",
+            "최종 비작업일수",
+            "최종 가동률"
+        ],
+        "값": [
+            f"{total_days}일",
+            f"{non_work1}일",  # 공휴일 + 토요일 + 일요일
+            f"{round(rain_avg)}일",
+            f"{round(total_non_work_days)}일",
+            f"{round((total_days - total_non_work_days) / total_days * 100, 1)}%"
+        ]
+    })
 
         return df1, df2, df3, holidays_days, sat_days, sun_days, round(rain_avg), total_days
 
