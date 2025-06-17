@@ -219,10 +219,10 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
 st.markdown(
     """
     <h1 style='text-align: center;'>공사가동률 계산기</h1>
-    <div style='height: 10px;'></div>
+    <div style='height: 20px;'></div>  <!-- 공백 한 줄 -->
     <p style='text-align: left; font-size: 0.85rem; color: #555;'>
         버전: v1.0.0<br>
-        최종 업데이트: 2025-06-16<br>
+        최종 업데이트: 2025년 6월 17일<br>
         개발자 : 동원건설산업 기술팀 김혁진
     </p>
     """,
