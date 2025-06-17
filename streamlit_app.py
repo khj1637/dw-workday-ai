@@ -100,7 +100,7 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         title="범례",
         loc="upper right",
         bbox_to_anchor=(1.25, 1),
-        prop=font_prop
+        prop=font_prop,
         fontsize=13,
         title_fontproperties=font_prop
     )
