@@ -111,7 +111,7 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         theta2 = angles[i + 1]
         wedge = Wedge(
             center=(0.08, -0.08),  # ↘ 방향 그림자
-            r=1.05,
+            r=1,
             theta1=theta1,
             theta2=theta2,
             facecolor='#555555',
