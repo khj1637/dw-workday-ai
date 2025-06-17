@@ -69,6 +69,23 @@ def get_statistical_rain_days(lat, lon, start, end, years=3, threshold=1.0):
     avg = round(sum(valid_years) / len(valid_years), 1) if valid_years else 0
     return results, avg
 
+# ----------- 동일 원형 그래프 그리는 함수 -------------
+def draw_fixed_pie(work, non_work, labels, colors, caption, font_prop):
+    fig, ax = plt.subplots(figsize=(3.5, 3.5))  # 정사각형 고정
+    wedges, texts, autotexts = ax.pie(
+        [work, non_work],
+        labels=labels,
+        autopct='%1.1f%%',
+        colors=colors,
+        textprops={'fontproperties': font_prop, 'fontsize': 14},
+        labeldistance=0.8,
+        pctdistance=0.6
+    )
+    ax.set_aspect('equal')  # 원형 유지
+    ax.text(0, -1.4, caption, ha='center', va='top', fontproperties=font_prop, fontsize=14)
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    return fig
+
 # 3. 예측 실행 함수
 def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, years, selected_options, threshold):
     try:
@@ -179,43 +196,31 @@ if st.button("📊 예측 실행"):
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            fig1, ax1 = plt.subplots(figsize=(4, 4))
-            ax1.pie(
-                [work1, non_work1],
-                labels=["가동", "비작업(공휴/주말)"],
-                autopct='%1.1f%%',
-                colors=["#4CAF50", "#FF9999"],
-                textprops={'fontproperties': font_prop, 'fontsize': 14}
+            fig1 = draw_fixed_pie(
+                work1, non_work1,
+                ["가동", "비작업(공휴/주말)"],
+                ["#4CAF50", "#FF9999"],
+                "공휴일/토/일 기반 가동률",
+                font_prop
             )
-            ax1.set_aspect('equal')
-            ax1.text(0, -1.3, "공휴일/토/일 기반 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
-            fig1.tight_layout(pad=2)
             st.pyplot(fig1)
 
         with col2:
-            fig2, ax2 = plt.subplots(figsize=(4, 4))
-            ax2.pie(
-                [work2, non_work2],
-                labels=["가동", "비작업(강수)"],
-                autopct='%1.1f%%',
-                colors=["#4CAF50", "#2196F3"],
-                textprops={'fontproperties': font_prop, 'fontsize': 14}
+            fig2 = draw_fixed_pie(
+                work2, non_work2,
+                ["가동", "비작업(강수)"],
+                ["#4CAF50", "#2196F3"],
+                "날씨 기반 가동률",
+                font_prop
             )
-            ax2.set_aspect('equal')
-            ax2.text(0, -1.3, "날씨 기반 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
-            fig2.tight_layout(pad=2)
             st.pyplot(fig2)
 
         with col3:
-            fig3, ax3 = plt.subplots(figsize=(4, 4))
-            ax3.pie(
-                [work3, total_non_work_days],
-                labels=["가동", "비작업(최종)"],
-                autopct='%1.1f%%',
-                colors=["#4CAF50", "#FFCC80"],
-                textprops={'fontproperties': font_prop, 'fontsize': 14}
+            fig3 = draw_fixed_pie(
+                work3, total_non_work_days,
+                ["가동", "비작업(최종)"],
+                ["#4CAF50", "#FFCC80"],
+                "최종 종합 가동률",
+                font_prop
             )
-            ax3.set_aspect('equal')
-            ax3.text(0, -1.3, "최종 종합 가동률", ha='center', va='top', fontproperties=font_prop, fontsize=14)
-            fig3.tight_layout(pad=2)
             st.pyplot(fig3)
