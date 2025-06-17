@@ -83,7 +83,6 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         [work, non_work],
         labels=None,  # ✅ 라벨 제거
         autopct='%1.1f%%',  # ✅ 퍼센트만
-        shadow=True,
         startangle=90,
         colors=colors,
         explode=explode,
