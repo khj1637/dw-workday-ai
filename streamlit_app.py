@@ -9,6 +9,20 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.patches import Wedge
 import os
 
+st.markdown(
+    """
+    <style>
+    /* 상단 'Made with Streamlit' 로고 숨김 */
+    header {visibility: hidden;}
+    
+    /* 하단 footer 숨김 (버튼 포함) */
+    footer {visibility: hidden;}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 percent_font = FontProperties(fname="fonts/NanumBarunGothicBold.ttf")
 
 # 폰트 경로
