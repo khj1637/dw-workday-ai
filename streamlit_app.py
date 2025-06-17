@@ -89,10 +89,10 @@ def draw_fixed_pie(work, non_work, colors, caption, font_prop):
         wedgeprops=dict(edgecolor='#666666', linewidth=1.5),
         pctdistance=0.6
     )
-    for autotext in autotexts:
+    for i, autotext in enumerate(autotexts):
         autotext.set_fontproperties(percent_font)
-        autotexts[0].set_color('white')     # 첫 번째 조각 (가동)
-        autotexts[1].set_color('white')     # 두 번째 조각 (비작업)
+        autotext.set_color('white')     # 첫 번째 조각 (가동)
+        autotext.set_fontsize(24)  # ✅ 퍼센트 글씨만 크게
         
     ax.set_aspect('equal')
 
