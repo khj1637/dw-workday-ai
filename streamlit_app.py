@@ -23,12 +23,6 @@ if not os.path.exists(FONT_PATH):
 font_prop = fm.FontProperties(fname=FONT_PATH)
 plt.rcParams['font.family'] = font_prop.get_name()
 
-# ✅ UI에서 표시될 라벨만 바꾸는 함수
-def label_formatter(option):
-    if option == "공휴일":
-        return "법정공휴일"
-    return option
-
 # 1. CSV 기반 공휴일 로딩
 def get_holidays_from_csv(start: datetime.date, end: datetime.date) -> set:
     try:
