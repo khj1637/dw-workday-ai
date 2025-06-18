@@ -262,7 +262,9 @@ st.markdown(
 )
 @st.cache_data
 def load_district_data():
-    return pd.read_csv("district_coords.csv")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(base_dir, "district_coords.csv")
+    return pd.read_csv(csv_path)
 
 district_df = load_district_data()
 
