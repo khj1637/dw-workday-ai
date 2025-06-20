@@ -9,26 +9,6 @@ from matplotlib.font_manager import FontProperties
 from matplotlib.patches import Wedge
 import os
 
-st.markdown(
-    """
-    <style>
-    /* 상단 'Made with Streamlit' 로고 숨김 */
-    header {visibility: hidden;}
-    
-    /* 하단 footer 숨김 (버튼 포함) */
-    footer {visibility: hidden;}
-    
-    /* 특정 클래스명 요소 숨김 */
-    ._profileContainer_gzau3_53 {visibility: hidden;}
-
-    /* 특정 클래스명 요소 숨김 */
-    ._container_gzau3_1 _viewerBadge_nim44_23 {visibility: hidden;}
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-
 percent_font = FontProperties(fname="fonts/NanumBarunGothicBold.ttf")
 
 # 폰트 경로
@@ -236,18 +216,6 @@ def predict_non_working_days(start_date, end_date, sido, sigungu, lat, lon, year
 
 
 # 4. UI
-st.markdown(
-    """
-    <div style="text-align: center; margin-bottom: 5px;">
-        <img src="https://raw.githubusercontent.com/khj1637/dw-workday-ai/main/img/logo.png"
-             alt="DongwonCI"
-             width="180"
-             style="display: block; margin: auto; padding-bottom: 5px;">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
 st.markdown(
     """
     <h1 style='text-align: center;'>공사가동률 계산기</h1>
